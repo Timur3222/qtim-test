@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+    --color-primary: #E2BEFF;
+
+    --color-ui-gray-100: #F3F3F3;
+    --color-ui-gray-200: #E8E8E8;
+    --color-ui-gray-300: #868686;
+    --color-ui-gray-400: #232323;
+    --color-ui-black: #101010;
+}
+
+@utility centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    font-size: 84px;
+}
