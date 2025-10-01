@@ -20,6 +20,7 @@ watch(article, (a) => {
       ogTitle: a.title,
       description: a.preview,
       ogDescription: a.preview,
+      ogImage: a.image,
     })
   }
 })
