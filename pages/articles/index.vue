@@ -12,27 +12,33 @@ useSeoMeta({
 const articlesStore = useArticlesStore()
 const ITEMS_PER_PAGE = 10
 
-const { pending, error } = await useAsyncData('articles', async () => {
-  if (articlesStore.articles?.length) {
+const {
+  data: articles,
+  pending,
+  error,
+} = await useAsyncData<Article[] | null>(
+  'articles',
+  async () => {
+    await articlesStore.fetchArticles()
     return articlesStore.articles
-  }
-  await articlesStore.fetchArticles()
-  return articlesStore.articles
-})
+  },
+  { getCachedData: () => articlesStore.articles },
+)
 
 const { currentPage, pagesCount } = usePagination()
 
-watchEffect(() => {
-  pagesCount.value = Math.ceil(
-    (articlesStore.articles?.length || 0) / ITEMS_PER_PAGE,
-  )
-})
+watch(
+  articles,
+  (articlesVal) => {
+    pagesCount.value = Math.ceil((articlesVal?.length || 0) / ITEMS_PER_PAGE)
+  },
+  { immediate: true },
+)
 
 const paginatedArticles = computed<Article[] | null>(() => {
-  if (!articlesStore.articles) return null
-
+  if (!articles.value) return null
   const startIndex = (currentPage.value - 1) * ITEMS_PER_PAGE
-  return articlesStore.articles.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+  return articles.value.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 })
 </script>
 
@@ -51,7 +57,7 @@ const paginatedArticles = computed<Article[] | null>(() => {
     <template v-else>
       <div class="articles-grid mb-[60px]">
         <div v-for="article in paginatedArticles" :key="article.id">
-          <AppArticle :article="article" />
+          <ArticleCard :article="article" />
         </div>
       </div>
 

@@ -23,8 +23,7 @@ const { imageLoaded, imageLoadError, onImageLoad, onImageError } =
         :src="article.image"
         alt="article image"
         fit="cover"
-        height="280px"
-        width="280px"
+        class="aspect-square w-full object-cover"
         @load="onImageLoad"
         @error="onImageError"
       />

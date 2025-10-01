@@ -1,26 +1,42 @@
 <script setup lang="ts">
+import { useArticlesStore } from '~/store/articles'
 import type { Article } from '~/types/article'
 
 const route = useRoute()
 const articleId = route.params.id as string
 
+const articlesStore = useArticlesStore()
+
+function getArticleById(): Article | null {
+  const article = articlesStore.detailedArticles.find(
+    (article) => article.id === articleId,
+  )
+  return article || null
+}
+
 const {
   data: article,
   pending,
   error,
-} = useAsyncData<Article>(`article-${articleId}`, () => {
-  const { $api } = useNuxtApp()
-  return $api(`/posts/${articleId}`)
-})
+} = useAsyncData<Article | null>(
+  `article-${articleId}`,
+  async () => {
+    await articlesStore.fetchArticle(articleId)
+    return getArticleById()
+  },
+  {
+    getCachedData: () => getArticleById(),
+  },
+)
 
-watch(article, (a) => {
-  if (a) {
+watchEffect(() => {
+  if (article.value) {
     useSeoMeta({
-      title: a.title,
-      ogTitle: a.title,
-      description: a.preview,
-      ogDescription: a.preview,
-      ogImage: a.image,
+      title: article.value.title,
+      ogTitle: article.value.title,
+      description: article.value.preview,
+      ogDescription: article.value.preview,
+      ogImage: article.value.image,
     })
   }
 })
